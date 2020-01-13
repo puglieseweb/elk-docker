@@ -63,11 +63,12 @@ services:
   fluentd:
     container_name: fluentd
     build: docker/fluentd
-    volumes:
-      - ./docker/fluentd/conf:/fluentd/etc
     ports:
       - "24224:24224"
       - "24224:24224/udp"
+        #  healthcheck: 
+        #      test: TODO 
+        #      retries: 3
     networks:
       - 'elk_stack'
     depends_on:
