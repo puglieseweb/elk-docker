@@ -59,6 +59,19 @@ services:
     depends_on:
       - 'elasticsearch'
 
+  # https://docs.fluentd.org/v/0.12/container-deployment/docker-compose
+  fluentd:
+    container_name: fluentd
+    build: docker/fluentd
+    volumes:
+      - ./docker/fluentd/conf:/fluentd/etc
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    networks:
+      - 'elk_stack'
+    depends_on:
+      - 'elasticsearch'
 
   # Configure Stack container. This short lived container configures the stack once Kibana and Elasticsearch
   # are available. More specifically, using a script it sets passwords, import dashboards,
@@ -72,7 +85,7 @@ services:
       - 'ES_PASSWORD=${ES_PASSWORD}'
       - 'ES_DEFAULT_INDEX_PATTERN=${ES_DEFAULT_INDEX_PATTERN}'
     volumes:
-      - './init/configure-stack.sh:/usr/local/bin/configure-stack.sh:ro'
+      - './docker/configure_stack/configure-stack.sh:/usr/local/bin/configure-stack.sh:ro'
     command: ['/bin/bash', '-c', 'cat /usr/local/bin/configure-stack.sh | tr -d "\r" | bash']
     # Internal network for the containers
     networks:
